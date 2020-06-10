@@ -1,0 +1,91 @@
+#define _CRT_SECURE_NO_DEPRECATE
+#include  "stdio.h"
+#include  "malloc.h"
+#define MAX 100                /*最大顶点数*/
+typedef int VertexType;
+int visited[MAX];              /*全局变量，访问数组*/
+
+typedef struct node
+{
+    int adjvex;                 /*邻接点域*/
+    struct node* next;          /*指向下一邻接点的指针域*/
+}EdgeNode;                     /*定义边表结点*/
+
+typedef struct vexnode
+{
+    VertexType data;            /*顶点域*/
+    EdgeNode* firstedge;        /*指向第一条边结点*/
+}VHeadNode;                    /*定义顶点表结点*/
+
+typedef struct
+{
+    VHeadNode adjlist[MAX];     /*邻接表头结点数组*/
+    int n, e;                    /*顶点数，边数*/
+}AdjList;                      /*图的邻接表类型*/
+
+void CreateAgraph(AdjList* g, int flag)                 //生成邻接表的函数
+{
+    int i, j, k;
+    EdgeNode* p;
+    if (flag == 0)
+        printf("\n将建立一个无向图。\n");
+    else
+        printf("\n将建立一个有向图。\n");
+    printf("请输入图的顶点数：");
+    scanf("%d", &g->n);
+    printf("请输入图的边数：");
+    scanf("%d", &g->e);
+    printf("\n请输入图的各顶点信息：\n");
+    for (i = 0; i < g->n; i++)
+    {
+        //getchar();
+        printf("第%d个顶点信息：", i + 1);
+        scanf("\n%d", &(g->adjlist[i].data));                   //读入顶点信息
+        g->adjlist[i].firstedge = NULL;                 //设表头指针为空
+    }
+    printf("\n请输入边的信息，输入格式为：序号1，序号2（序号依次为0、1、2……）：\n");
+    for (k = 0; k < g->e; k++)
+    {
+        printf("请输入第%d条边：", k);
+        scanf("\n%d,%d", &i, &j);
+        p = (EdgeNode*)malloc(sizeof(EdgeNode));
+        p->adjvex = j;
+        p->next = g->adjlist[i].firstedge;                  //p->指向NULL
+        g->adjlist[i].firstedge = p;
+        if (flag == 0)                  //有向图该循环不执行
+        {
+            p = (EdgeNode*)malloc(sizeof(EdgeNode));
+            p->adjvex = i;
+            p->next = g->adjlist[j].firstedge;
+            g->adjlist[j].firstedge = p;
+        }
+    }
+}
+
+void DispAgraph(AdjList* g)                 //输出图的邻接表函数
+{
+    int i;
+    EdgeNode* p;
+    printf("\n图的邻接表表示如下：\n");
+    for (i = 0; i < g->n; i++)
+    {
+        printf("%2d [%d]", i, g->adjlist[i].data);
+        p = g->adjlist[i].firstedge;
+        while (p != NULL)
+        {
+            printf("-->[%d]", p->adjvex);
+            p = p->next;
+        }
+        printf("\n");
+    }
+}
+
+void main()
+{
+    int flag;
+    AdjList g;
+    printf("要建立的是有向图（1）还是无向图（0），请输入1或0选择：");
+    scanf("%d", &flag);
+    CreateAgraph(&g, flag);
+    DispAgraph(&g);
+}
